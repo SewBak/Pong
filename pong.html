@@ -1,0 +1,179 @@
+<html>
+	<head>
+		<title>BOOTLEG PONG</title>
+	</head>
+	<body style = "background-color:black;" onkeydown = "keyDownRedirect(event.keyCode)" onkeyup = "keyUpRedirect(event.keyCode)">
+		<canvas id = "c" width = "1200" height = "600" style = "border:2px solid green" onclick = "reset();"></canvas>
+		<p id = "score" style = "display:block;position:fixed;color:green;float:right;font-size:40px;top:0px;left:20px;"></p>
+		<script>
+			var d = document.getElementById("c").getContext("2d");
+			var score = document.getElementById("score");
+			var p1score = 0;
+			var p2score = 0;
+			score.innerHTML = p1score + " - " + p2score;
+			d.fillStyle = "green";
+			var x = 592;
+			var y = 292;
+			var xs = -5;
+			var ys = 0;
+			const s = 15;
+			const psx = 30;
+			const psy = 200;
+			const fps = 50;
+			const framerule = 1000 / fps;
+			var startable1 = true;
+			var startable2 = true;
+			var p1start;
+			var p2start;
+			var canReset = false;
+			var p1 = {
+				x:100,
+				y:200
+			}
+			var p2 = {
+				x:1100,
+				y:200
+			}
+			d.fillRect(x,y,s,s);
+			d.fillRect(p1.x,p1.y,psx,psy);
+			d.fillRect(p2.x,p2.y,psx,psy);
+			var start = setInterval(update,framerule);
+			function reset(){
+				if(canReset == true){
+					d.clearRect(0,0,1200,600);
+					x = 592;
+					y = 292;
+					if(Math.floor(Math.random() * 3) == 1){
+						xs = -5;
+					}else{ xs = 5 }
+					ys = 0;
+					startable1 = true;
+					startable2 = true;
+					p1.x = 100;
+					p1.y = 200;
+					p2.x = 1100;
+					p2.y = 200;
+					d.fillRect(x,y,s,s);
+					d.fillRect(p1.x,p1.y,psx,psy);
+					d.fillRect(p2.x,p2.y,psx,psy);
+					window.start = setInterval(update,framerule);
+					canReset = false;
+				}
+			}
+			function update(){
+				d.clearRect(x,y,s,s);
+				x += xs;
+				y += ys;
+				d.fillRect(x,y,s,s);
+				bounceCheck();
+				winCheck();
+			}
+			function bounceCheck(){
+				if(y + s >= 600 || y <= 0 ){
+					ys = -ys;
+				}
+				else if((x <= p1.x + 40 && x >= p1.x) && (y >= p1.y && y <= p1.y + psy)){
+					xs = -xs + 1;
+					ys = ys - Math.floor(Math.random()* 6);
+					d.fillRect(p1.x,p1.y,psx,psy);
+					d.fillRect(p2.x,p2.y,psx,psy);
+				}
+				else if((x >= p2.x - 20 && x <= p2.x + psx) && (y >= p2.y && y <= p2.y + psy)){
+					xs = -xs - 1;
+					ys = ys + Math.floor(Math.random()* 6);
+					d.fillRect(p1.x,p1.y,psx,psy);
+					d.fillRect(p2.x,p2.y,psx,psy);
+				}
+			}
+			function keyDownRedirect(key){
+				switch(key){
+					case 87:
+					moveStart(1,1);
+					break;
+					case 83:
+					moveStart(1,2);
+					break;
+					case 79:
+					moveStart(2,1);
+					break;
+					case 76:
+					moveStart(2,2);
+					break;
+					
+				}
+			}
+			function moveStart(player,dir){
+				if(player == 1){
+					if(startable1 == true){
+						p1start = setInterval(function(){movePlayerOne(dir)},20);
+					}
+				}
+				else if(player == 2){
+					if(startable2 == true){
+						p2start = setInterval(function(){movePlayerTwo(dir)},20);
+					}
+				}
+			}
+			function movePlayerOne(dir){
+				startable1 = false;
+				if(dir == 1){
+					d.clearRect(p1.x,p1.y,psx,psy);
+					p1.y = p1.y - 15;
+					d.fillRect(p1.x,p1.y,psx,psy);
+				}else{
+					d.clearRect(p1.x,p1.y,psx,psy);
+					p1.y += 15;
+					d.fillRect(p1.x,p1.y,psx,psy);
+				}
+			}
+			function movePlayerTwo(dir){
+				startable2 = false;
+				if(dir == 1){
+					d.clearRect(p2.x,p2.y,psx,psy);
+					p2.y = p2.y - 15;
+					d.fillRect(p2.x,p2.y,psx,psy);
+				}else{
+					d.clearRect(p2.x,p2.y,psx,psy);
+					p2.y += 15;
+					d.fillRect(p2.x,p2.y,psx,psy);
+				}
+			}
+			function keyUpRedirect(key){
+				switch(key){
+					case 87:
+					clearInterval(p1start);
+					startable1 = true;
+					break;
+					case 83:
+					clearInterval(p1start);
+					startable1 = true;
+					break;
+					case 79:
+					clearInterval(p2start);
+					startable2 = true;
+					break;
+					case 76:
+					clearInterval(p2start);
+					startable2 = true;
+					break;
+				}
+			}
+			function winCheck(){
+				if(x <= 0){
+					win(2);
+				}
+				else if(x + s >= 1200){
+					win(1);
+				}
+			}
+			function win(player){
+				clearInterval(start);
+				canReset = true;
+				if(player == 1){
+					p1score++;
+				}else{p2score++;}
+				score.innerHTML = p1score + " - " + p2score;
+			}
+		</script>
+	</body>
+</html>
